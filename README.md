@@ -12,6 +12,4 @@ This installs the skill into your agent (e.g. `.claude/skills/`). It assumes the
 
 ## Contents
 
-- [`SKILL.md`](SKILL.md) — when to use each tool, scoping, budget/error handling.
-- [`references/tools.md`](references/tools.md) — full tool contracts and example arguments.
-- [`references/sql-views.md`](references/sql-views.md) — `llm_*` view columns and safe SQL patterns.
+- [`SKILL.md`](SKILL.md) — self-contained usage guide: tool selection, scoping, budgets/errors, the full tool reference, and the `llm_*` SQL views reference.

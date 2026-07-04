@@ -13,7 +13,7 @@ Call `get_key_info` first — it's **free** (never debits your budget). It retur
 
 ## Scoping
 
-- Store tools take a `slug`. With a single-store key you may omit `slug` (it defaults to your one store). A slug outside your key's allowlist fails with `store_not_allowed`.
+- Store tools take a `slug`. With a single-store key you may omit it (it defaults to your one store); **all-store (`*`) and multi-store keys must pass `slug` explicitly** — omitting it errors with `invalid_arguments`. A slug outside your key's allowlist fails with `store_not_allowed`.
 - All-store keys (`*`) additionally get the global tools (`global_keyword_search_products`, `global_semantic_search_products`, `global_hybrid_search_products`, `global_list_inventory_products`, `readonly_sql_global`). Store-scoped keys don't see them at all.
 - A multi-store key (no wildcard) queries one slug at a time.
 
@@ -83,6 +83,7 @@ Free. No arguments.
 | `availability` | `all\|available\|in_stock` | |
 | `sort` | `updated_desc\|price_asc\|price_desc\|title_asc\|relevance` | |
 | `min_semantic_score` | 0-1 | Default 0.4; semantic/hybrid |
+| `per_embedding_limit` | int | Semantic/hybrid; per-embedding candidate cap before fusion |
 | `family_keys` | string[] | Embedding families; omit to use all active |
 | `target_modalities` | ("text"\|"image")[] | |
 | `text_doc_type` | ("seo"\|"metadata"\|"description"\|"image_caption")[] | |
@@ -124,6 +125,8 @@ Response: `{ columns: [{name, data_type}], rows: [...], row_count, execution_ms,
 
 Use only `llm_*` views. Never query raw tables, never use semicolons, prefer explicit column lists (`select *` only for a one-row schema probe). Do not invent columns like `id`, `name`, `product_name`, `is_ready`. Canonical columns: `product_id` (products), `slug` (stores), `title` (titles), `status` (readiness/state), `collection_handle` (collection filters), `family_key` (embedding family), `estimated_cost_usd` (cost).
 
+`raw_product_type` is the product-type column in SQL (search **responses** call it `product_type`). It's free-form and inconsistent — `Ring`, `Rings`, `Gold Ring`, `Demi Fine Rings` coexist, and `Earrings` contains "ring". Run `select distinct raw_product_type from llm_products` before filtering, then use an explicit `in (...)` list or an anchored pattern; `ilike '%ring%'` also matches earrings, so exclude them with `and raw_product_type not ilike '%earring%'`.
+
 ## Store-scoped views (`readonly_sql_store`)
 
 - `llm_products` — `product_id`, `external_product_id`, `canonical_url`, `title`, `brand`, `raw_product_type`, `currency`, `min_price`, `max_price`, `available_for_sale`, `in_stock`, `status`, `created_at`, `updated_at`.
@@ -141,6 +144,7 @@ Use only `llm_*` views. Never query raw tables, never use semicolons, prefer exp
 - `llm_latest_runs` — `store_slug`, `crawl_run_id`, `run_type`, `status`, `created_at`, `finished_at`, `error_json`.
 - `llm_product_counts_by_store` — `store_slug`, `products_total`, `products_active`, `products_available`, `products_in_stock`, `min_price`, `max_price`.
 - `llm_collection_counts_by_store` — `store_slug`, `collections_total`, `collections_active`.
+- `llm_embedding_costs` — `store_slug`, `family_key`, `modality`, `entity_type`, `estimated_tokens`, `estimated_cost_usd`.
 - `llm_global_products` — cross-store product rows; mirrors `llm_products` columns plus `store_slug`.
 
 ## Example queries

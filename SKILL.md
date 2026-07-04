@@ -1,11 +1,13 @@
 ---
 name: jacard-copper-core-skill
-description: Use when an agent needs retail catalog answers through the Jacard Copper Core MCP — keyword/semantic/hybrid product search, deterministic inventory lists, product detail, collection facets, and readonly SQL over llm_* views. Assumes the MCP is already connected with a valid key.
+description: Retail catalog retrieval via the Jacard Copper Core MCP — keyword, semantic, and hybrid product search, deterministic inventory lists, product detail, collection facets, and readonly SQL over llm_* views. Use when answering retail catalog or product questions (search, counts, availability, prices, collections) with this MCP. Assumes the MCP is already connected with a valid key.
 ---
 
 # Jacard Copper Core MCP — usage guide
 
 How to get good results from the **Jacard Copper Core MCP** (retail catalog retrieval). The MCP is already connected and authenticated for you; this skill is about using its tools well. Calls are metered per API key (allowed store slugs, a per-minute rate limit, and a daily request budget), so behavior below follows from your key.
+
+Tool names below are unqualified (`get_key_info`, `keyword_search_products`, …). Invoke each as a tool of the connected MCP server, qualified by the name you registered it under — e.g. `jacard-copper-core-mcp:get_key_info`.
 
 ## Start with get_key_info
 
